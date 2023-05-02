@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
             SimpleLoginTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-                    intent.getStringExtra("login")?.let { Greeting(name = it) }
+                    intent.getStringExtra("login")?.let { Greeting(name = it, password = intent.getStringExtra("password")!!, phonenumber = intent.getStringExtra("phonenumber")!!) };
                 }
             }
         }
@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String) {
+fun Greeting(name: String, password: String, phonenumber: String) {
 
     val context = LocalContext.current;
 
@@ -53,6 +53,10 @@ fun Greeting(name: String) {
 
             intent.putExtra("login", name)
 
+            intent.putExtra("password", password)
+
+            intent.putExtra("phonenumber", phonenumber)
+
             context.startActivity(intent)
 
         }) {
@@ -66,6 +70,6 @@ fun Greeting(name: String) {
 @Composable
 fun DefaultPreview() {
     SimpleLoginTheme {
-        Greeting(name = "Ilya")
+//        Greeting(name = "Ilya")
     }
 }

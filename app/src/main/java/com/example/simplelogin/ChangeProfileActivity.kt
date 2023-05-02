@@ -3,6 +3,7 @@ package com.example.simplelogin
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -31,7 +32,7 @@ class ChangeProfileActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    intent.getStringExtra("login")?.let { ProfileEdit(name = it) }
+                    intent.getStringExtra("login")?.let { ProfileEdit(name = it, password = intent.getStringExtra("password")!!, phonenumber = intent.getStringExtra("phonenumber")!!) }
                 }
             }
         }
@@ -46,30 +47,15 @@ fun Greeting3(name: String) {
 
 
 @Composable
-fun ProfileEdit(name: String){
-
+fun ProfileEdit(name: String, password: String, phonenumber: String){
 
     val context = LocalContext.current;
     val db: AppDatabase = AppDatabase.getDatabase(context)
-    var current_user: User = User(1, "89053771403", "Ilya", "1234")
+
     val rememberCoroutineScope = rememberCoroutineScope();
 
-    fun coroutine(context: Context){
-
-        rememberCoroutineScope.launch {
-
-            var return_user = db.getUserDao().getUserForReg(name)
-
-            current_user = return_user
-
-        }
-
-    }
-
-    coroutine(context)
-
-    var login by remember { mutableStateOf(current_user.login.toString()) };
-    var password by remember { mutableStateOf(current_user.password.toString()) };
+    var login by remember { mutableStateOf(name) };
+    var password by remember { mutableStateOf(password) };
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -78,18 +64,53 @@ fun ProfileEdit(name: String){
             .background(Color.LightGray)
             .fillMaxSize()
     ) {
-        current_user.phonenumber?.let { Text(text = it) }
+        Text(text = phonenumber)
         OutlinedTextField(value = login, onValueChange = {login = it})
-//        password?.let { s -> OutlinedTextField(value = s, onValueChange = {password = it}) }
         OutlinedTextField(value = password, onValueChange = {password = it})
-        Button(onClick = { /*TODO*/ }) {
+        Button(onClick = {
+
+            rememberCoroutineScope.launch {
+
+                var possible_user: User = db.getUserDao().getUserForReg(login)
+
+                if ((possible_user == null) or (login == name)){
+
+                    db.getUserDao().updateUserProfile(name, login, password)
+
+                    val intent = Intent(context, MainActivity::class.java)
+
+                    intent.putExtra("login", login)
+
+                    intent.putExtra("password", password)
+
+                    intent.putExtra("phonenumber", phonenumber)
+
+                    context.startActivity(intent)
+
+                }else{
+
+                    Toast.makeText(
+                        context,
+                        "Логин занят",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                }
+
+            }
+
+        }) {
             Text("Сохранить")
         }
         Button(onClick = {
 
             val intent = Intent(context, MainActivity::class.java)
 
-            intent.putExtra("login", login)
+            intent.putExtra("login", name)
+
+            intent.putExtra("password", password)
+
+            intent.putExtra("phonenumber", phonenumber)
 
             context.startActivity(intent)
 

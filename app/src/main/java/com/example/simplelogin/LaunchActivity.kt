@@ -103,6 +103,10 @@ fun Authorization(){
 
                     intent.putExtra("login", login)
 
+                    intent.putExtra("password", possible_user.password);
+
+                    intent.putExtra("phonenumber", possible_user.phonenumber);
+
                     context.startActivity(intent)
 
                 }
@@ -187,6 +191,10 @@ fun Registration(){
                     val intent = Intent(context, MainActivity::class.java)
 
                     intent.putExtra("login", login)
+
+                    intent.putExtra("password", password);
+
+                    intent.putExtra("phonenumber", phonenumber);
 
                     context.startActivity(intent)
 

@@ -16,6 +16,9 @@ interface UserDAO {
     @Query("SELECT * FROM users WHERE login=:login LIMIT 1")
     suspend fun getUserForReg(login: String): User
 
+    @Query("UPDATE users SET login = :newlogin, password = :password WHERE login = :login")
+    suspend fun updateUserProfile(login: String, newlogin: String, password: String)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUser(users: User)
 

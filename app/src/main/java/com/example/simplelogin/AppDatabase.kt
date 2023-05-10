@@ -5,10 +5,12 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(version = 1, entities = [User::class])
+@Database(version = 1, entities = [User::class, Token::class])
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun getUserDao() : UserDAO
+
+    abstract fun getTokenDao(): TokenDAO
 
 //    fun getDatabase(context: Context) : AppDatabase{
 //

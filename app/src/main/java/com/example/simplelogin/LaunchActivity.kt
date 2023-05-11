@@ -31,12 +31,36 @@ import io.reactivex.rxjava3.core.Maybe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import java.util.Calendar
+import kotlin.random.Random
 
 
 class LaunchActivity : ComponentActivity() {
     @OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val currentTime = Calendar.getInstance().time
+
+        val sessionIsActive = SessionManagerUtil.isSessionActive(currentTime, this)
+
+        if (sessionIsActive){
+
+            val intent = Intent(this, MainActivity::class.java)
+
+//            intent.putExtra("login", SessionManagerUtil.sessionGetLogin(this))
+//
+//            intent.putExtra("password", SessionManagerUtil.sessionGetPassword(this));
+//
+//            intent.putExtra("phonenumber", SessionManagerUtil.sessionGetPhonenumber(this));
+
+            intent.putExtra("login", "testLogin")
+            intent.putExtra("password", "testPassword")
+            intent.putExtra("phonenumber", "testPhonenumber")
+            this.startActivity(intent)
+
+        }
+
         setContent {
             SimpleLoginTheme {
                 // A surface container using the 'background' color from the theme
@@ -107,6 +131,22 @@ fun Authorization(){
 
                     intent.putExtra("phonenumber", possible_user.phonenumber);
 
+                    possible_user.role?.let { SessionManagerUtil.storeUserToken(context, it) }
+
+                    var possible_token = possible_user.phonenumber?.let {
+                        db.getTokenDao().getRefreshToken(
+                            it
+                        )
+                    }
+
+                    if (possible_token != null) {
+                        SessionManagerUtil.storeRefreshToken(context, possible_token.refresh!!)
+                    }
+
+                    SessionManagerUtil.sessionStoreUserData(context, login, possible_user.password!!, possible_user.phonenumber!!);
+
+                    SessionManagerUtil.startUserSession(context, 60)
+
                     context.startActivity(intent)
 
                 }
@@ -168,7 +208,9 @@ fun Registration(){
 
         }else{
 
-            var user: User = User(null, phonenumber, login, password)
+            var user: User = User(null, phonenumber, login, password, "user")
+
+//            var token: Token = Token(null,phonenumber, Random.nextInt(0,100).toString())
 
 
             val db: AppDatabase = AppDatabase.getDatabase(context)
@@ -195,6 +237,16 @@ fun Registration(){
                     intent.putExtra("password", password);
 
                     intent.putExtra("phonenumber", phonenumber);
+
+//                    db.getTokenDao().insertToken(token)
+
+//                    SessionManagerUtil.storeUserToken(context, "user")
+
+//                    token.refresh?.let { SessionManagerUtil.storeRefreshToken(context, it) }
+
+//                    SessionManagerUtil.sessionStoreUserData(context, login, password, phonenumber);
+
+//                    SessionManagerUtil.startUserSession(context, 60)
 
                     context.startActivity(intent)
 

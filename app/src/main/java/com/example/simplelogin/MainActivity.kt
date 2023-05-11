@@ -28,6 +28,13 @@ class MainActivity : ComponentActivity() {
             SimpleLoginTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+
+//                    if (SessionManagerUtil.getUserToken(this) == "user"){
+//
+//                        intent.getStringExtra("login")?.let { Greeting(name = it, password = intent.getStringExtra("password")!!, phonenumber = intent.getStringExtra("phonenumber")!!) };
+//
+//                    }
+
                     intent.getStringExtra("login")?.let { Greeting(name = it, password = intent.getStringExtra("password")!!, phonenumber = intent.getStringExtra("phonenumber")!!) };
                 }
             }

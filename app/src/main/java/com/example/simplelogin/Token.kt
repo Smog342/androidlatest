@@ -10,6 +10,6 @@ data class Token(
 
     @ColumnInfo(name = "id") @PrimaryKey(autoGenerate = true) val id: Int? = null,
     @ColumnInfo(name = "phonenumber") val phonenumber: String?,
-    @ColumnInfo(name = "refresh") val login: String?
+    @ColumnInfo(name = "refresh") val refresh: String?
 
 ): Serializable

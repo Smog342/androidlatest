@@ -2,18 +2,19 @@ package com.example.simplelogin
 
 import androidx.room.*
 
+@Dao
 interface TokenDAO {
 
     @Query("SELECT * FROM Tokens WHERE phonenumber = :phonenumber LIMIT 1")
     suspend fun getRefreshToken(phonenumber: String) : Token
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertUser(token: Token)
+    suspend fun insertToken(token: Token)
 
     @Delete
-    suspend fun deleteUser(token: Token)
+    suspend fun deleteToken(token: Token)
 
     @Update
-    suspend fun updateUser(token: Token)
+    suspend fun updateToken(token: Token)
 
 }

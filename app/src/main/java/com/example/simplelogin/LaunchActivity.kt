@@ -37,16 +37,33 @@ class LaunchActivity : ComponentActivity() {
     @OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            SimpleLoginTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    MainScreen()
+
+        val sharedPreferences = getSharedPreferences("pref", Context.MODE_PRIVATE)
+        val username = sharedPreferences.getString("username", "")
+
+        if (username.isNullOrEmpty()){
+
+            setContent {
+                SimpleLoginTheme {
+                    // A surface container using the 'background' color from the theme
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colors.background
+                    ) {
+                        MainScreen()
+                    }
                 }
             }
+
+        }else{
+
+            val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("username", username)
+            intent.putExtra("phoneNumber", sharedPreferences.getString("phoneNumber", ""))
+            intent.putExtra("password", sharedPreferences.getString("password", ""))
+            intent.putExtra("role", sharedPreferences.getString("role", ""))
+            startActivity(intent)
+
         }
     }
 }
@@ -77,7 +94,10 @@ fun Authorization(){
 
         }else{
 
-            val db: AppDatabase = AppDatabase.getDatabase(context)
+            val db = Room.databaseBuilder(
+                context,
+                AppDatabase::class.java, "database-name"
+            ).build()
 
             rememberCoroutineScope.launch {
 
@@ -101,11 +121,24 @@ fun Authorization(){
 
                     val intent = Intent(context, MainActivity::class.java)
 
+                    val sharedPreferences = context.getSharedPreferences("pref", Context.MODE_PRIVATE);
+
                     intent.putExtra("login", login)
 
                     intent.putExtra("password", possible_user.password);
 
                     intent.putExtra("phonenumber", possible_user.phonenumber);
+
+                    intent.putExtra("role", possible_user.role);
+
+                    val editor = sharedPreferences.edit()
+                    editor.putString("username", possible_user.login)
+                    editor.putString("phoneNumber", possible_user.phonenumber)
+                    editor.putString("password", possible_user.password)
+                    editor.putString("role", possible_user.role)
+                    editor.apply()
+
+                    SessionManagerUtil.startUserSession(context, 15);
 
                     context.startActivity(intent)
 
@@ -168,10 +201,13 @@ fun Registration(){
 
         }else{
 
-            var user: User = User(null, phonenumber, login, password)
+            var user: User = User(null, phonenumber, login, password, "admin")
 
 
-            val db: AppDatabase = AppDatabase.getDatabase(context)
+            val db = Room.databaseBuilder(
+                context,
+                AppDatabase::class.java, "database-name"
+            ).build()
 
 
             rememberCoroutineScope.launch {
@@ -190,11 +226,24 @@ fun Registration(){
 
                     val intent = Intent(context, MainActivity::class.java)
 
+                    val sharedPreferences = context.getSharedPreferences("pref", Context.MODE_PRIVATE);
+
                     intent.putExtra("login", login)
 
                     intent.putExtra("password", password);
 
                     intent.putExtra("phonenumber", phonenumber);
+
+                    intent.putExtra("role", "admin");
+
+                    val editor = sharedPreferences.edit()
+                    editor.putString("username", possible_user.login)
+                    editor.putString("phoneNumber", possible_user.phonenumber)
+                    editor.putString("password", possible_user.password)
+                    editor.putString("role", possible_user.role)
+                    editor.apply()
+
+                    SessionManagerUtil.startUserSession(context,15);
 
                     context.startActivity(intent)
 

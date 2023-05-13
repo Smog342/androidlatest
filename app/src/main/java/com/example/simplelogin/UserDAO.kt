@@ -19,6 +19,9 @@ interface UserDAO {
     @Query("UPDATE users SET login = :newlogin, password = :password WHERE login = :login")
     suspend fun updateUserProfile(login: String, newlogin: String, password: String)
 
+    @Query("UPDATE users SET role = :role WHERE uid = :userId")
+    suspend fun updateUserRole(userId: Int, role: String)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUser(users: User)
 

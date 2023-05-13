@@ -2,4 +2,5 @@
     <string name="app_name">SimpleLogin</string>
     <string name="title_activity_launch">LaunchActivity</string>
     <string name="title_activity_change_profile">ChangeProfileActivity</string>
+    <string name="title_activity_user_edit">UserEditActivity</string>
 </resources>

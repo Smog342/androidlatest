@@ -168,7 +168,7 @@ fun Registration(){
 
         }else{
 
-            var user: User = User(null, phonenumber, login, password)
+            var user: User = User(null, phonenumber, login, password, "user")
 
 
             val db: AppDatabase = AppDatabase.getDatabase(context)

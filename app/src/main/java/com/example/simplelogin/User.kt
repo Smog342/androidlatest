@@ -11,6 +11,7 @@ data class User(
     @ColumnInfo(name = "id") @PrimaryKey(autoGenerate = true) val id: Int? = null,
     @ColumnInfo(name = "phonenumber") val phonenumber: String?,
     @ColumnInfo(name = "login") val login: String?,
-    @ColumnInfo(name = "password") val password: String?
+    @ColumnInfo(name = "password") val password: String?,
+    @ColumnInfo(name = "role", defaultValue = "user") val role: String?
 
 ) : Serializable

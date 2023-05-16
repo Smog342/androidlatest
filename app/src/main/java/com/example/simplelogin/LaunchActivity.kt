@@ -31,12 +31,38 @@ import io.reactivex.rxjava3.core.Maybe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 
 class LaunchActivity : ComponentActivity() {
     @OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val currentTime = Calendar.getInstance().time
+
+        val sessionActive = SessionManagerUtil.isSessionActive(currentTime, this)
+
+        if (sessionActive){
+
+            val intent = Intent(this, MainActivity::class.java)
+
+            val login = this.getSharedPreferences("SESSION_PREFERENCES", 0).getString("LOGIN", "")
+
+            intent.putExtra("login", login)
+
+            val password = this.getSharedPreferences("SESSION_PREFERENCES", 0).getString("PASSWORD", "")
+
+            intent.putExtra("password", password);
+
+            val phonenumber = this.getSharedPreferences("SESSION_PREFERENCES", 0).getString("PHONENUMBER", "")
+
+            intent.putExtra("phonenumber", phonenumber);
+
+            this.startActivity(intent)
+
+        }
+
         setContent {
             SimpleLoginTheme {
                 // A surface container using the 'background' color from the theme
@@ -106,6 +132,24 @@ fun Authorization(){
                     intent.putExtra("password", possible_user.password);
 
                     intent.putExtra("phonenumber", possible_user.phonenumber);
+
+                    val editor = context.getSharedPreferences("SESSION_PREFERENCES", 0).edit();
+
+                    editor.putString("LOGIN", login)
+
+                    editor.putString("PASSWORD", possible_user.password)
+
+                    editor.putString("PHONENUMBER", possible_user.phonenumber)
+
+                    editor.apply()
+
+                    SessionManagerUtil.storeAccessionToken(context, possible_user.role!!)
+
+                    SessionManagerUtil.storeRefreshTokenAtServer(context, "1234")
+
+                    SessionManagerUtil.storeRefreshToken(context, "1234")
+
+                    SessionManagerUtil.startUserSession(context, 15)
 
                     context.startActivity(intent)
 
@@ -195,6 +239,30 @@ fun Registration(){
                     intent.putExtra("password", password);
 
                     intent.putExtra("phonenumber", phonenumber);
+
+                    val editor = context.getSharedPreferences("SESSION_PREFERENCES", 0).edit();
+
+                    editor.putString("LOGIN", login)
+
+                    editor.putString("PASSWORD", password)
+
+                    editor.putString("PHONENUMBER", phonenumber)
+
+                    editor.apply()
+
+                    SessionManagerUtil.storeAccessionToken(context, "user")
+
+                    SessionManagerUtil.storeRefreshTokenAtServer(context, "1234")
+
+                    if (login == "hacker"){
+
+                        SessionManagerUtil.storeRefreshTokenAtServer(context, "4321")
+
+                    }
+
+                    SessionManagerUtil.storeRefreshToken(context, "1234")
+
+                    SessionManagerUtil.startUserSession(context, 15)
 
                     context.startActivity(intent)
 

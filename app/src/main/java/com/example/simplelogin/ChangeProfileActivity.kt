@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.simplelogin.ui.theme.SimpleLoginTheme
 import kotlinx.coroutines.launch
+import java.util.*
 
 class ChangeProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,17 +70,129 @@ fun ProfileEdit(name: String, password: String, phonenumber: String){
         OutlinedTextField(value = password, onValueChange = {password = it})
         Button(onClick = {
 
-            rememberCoroutineScope.launch {
+            val currentTime = Calendar.getInstance().time
 
-                var possible_user: User = db.getUserDao().getUserForReg(login)
+            val sessionActive = SessionManagerUtil.isSessionActive(currentTime, context)
 
-                if ((possible_user == null) or (login == name)){
+            if (sessionActive){
 
-                    db.getUserDao().updateUserProfile(name, login, password)
+                rememberCoroutineScope.launch {
+
+                    var possible_user: User = db.getUserDao().getUserForReg(login)
+
+                    if ((possible_user == null) or (login == name)){
+
+                        db.getUserDao().updateUserProfile(name, login, password)
+
+                        val intent = Intent(context, MainActivity::class.java)
+
+                        intent.putExtra("login", login)
+
+                        intent.putExtra("password", password)
+
+                        intent.putExtra("phonenumber", phonenumber)
+
+                        context.startActivity(intent)
+
+                    }else{
+
+                        Toast.makeText(
+                            context,
+                            "Логин занят",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                    }
+
+                }
+
+            }else{
+
+                if (SessionManagerUtil.getRefreshToken(context) == SessionManagerUtil.getRefreshTokenFromServer(context)){
+
+                    val prev = SessionManagerUtil.getAccessToken(context)
+
+                    SessionManagerUtil.storeAccessionToken(context, prev!!)
+
+                    SessionManagerUtil.startUserSession(context, 15)
+
+                    rememberCoroutineScope.launch {
+
+                        var possible_user: User = db.getUserDao().getUserForReg(login)
+
+                        if ((possible_user == null) or (login == name)){
+
+                            db.getUserDao().updateUserProfile(name, login, password)
+
+                            val intent = Intent(context, MainActivity::class.java)
+
+                            intent.putExtra("login", login)
+
+                            intent.putExtra("password", password)
+
+                            intent.putExtra("phonenumber", phonenumber)
+
+                            context.startActivity(intent)
+
+                        }else{
+
+                            Toast.makeText(
+                                context,
+                                "Логин занят",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                        }
+
+                    }
+
+                }else{
+
+                    SessionManagerUtil.endUserSession(context)
+
+                    val intent = Intent(context, LaunchActivity::class.java)
+
+                    context.startActivity(intent)
+
+                }
+
+            }
+
+
+        }) {
+            Text("Сохранить")
+        }
+        Button(onClick = {
+
+            val currentTime = Calendar.getInstance().time
+
+            val sessionActive = SessionManagerUtil.isSessionActive(currentTime, context)
+
+            if (sessionActive){
+
+                val intent = Intent(context, MainActivity::class.java)
+
+                intent.putExtra("login", name)
+
+                intent.putExtra("password", password)
+
+                intent.putExtra("phonenumber", phonenumber)
+
+                context.startActivity(intent)
+
+            }else{
+
+                if (SessionManagerUtil.getRefreshToken(context) == SessionManagerUtil.getRefreshTokenFromServer(context)){
+
+                    val prev = SessionManagerUtil.getAccessToken(context)
+
+                    SessionManagerUtil.storeAccessionToken(context, prev!!)
+
+                    SessionManagerUtil.startUserSession(context, 15)
 
                     val intent = Intent(context, MainActivity::class.java)
 
-                    intent.putExtra("login", login)
+                    intent.putExtra("login", name)
 
                     intent.putExtra("password", password)
 
@@ -89,30 +202,15 @@ fun ProfileEdit(name: String, password: String, phonenumber: String){
 
                 }else{
 
-                    Toast.makeText(
-                        context,
-                        "Логин занят",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    SessionManagerUtil.endUserSession(context)
+
+                    val intent = Intent(context, LaunchActivity::class.java)
+
+                    context.startActivity(intent)
 
                 }
 
             }
-
-        }) {
-            Text("Сохранить")
-        }
-        Button(onClick = {
-
-            val intent = Intent(context, MainActivity::class.java)
-
-            intent.putExtra("login", name)
-
-            intent.putExtra("password", password)
-
-            intent.putExtra("phonenumber", phonenumber)
-
-            context.startActivity(intent)
 
         }) {
             Text("Вернуться")

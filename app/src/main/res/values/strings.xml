@@ -3,4 +3,5 @@
     <string name="title_activity_launch">LaunchActivity</string>
     <string name="title_activity_change_profile">ChangeProfileActivity</string>
     <string name="title_activity_edit_user">EditUserActivity</string>
+    <string name="title_activity_weather">WeatherActivity</string>
 </resources>

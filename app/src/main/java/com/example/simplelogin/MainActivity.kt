@@ -166,6 +166,26 @@ fun Greeting(name: String, password: String, phonenumber: String) {
 
         }
 
+        if (context.getSharedPreferences("SESSION_PREFERENCES", 0).getString("SESSION_ACCESS_TOKEN", "") == "user") {
+
+            Button(onClick = {
+
+                val intent = Intent(context, WeatherActivity::class.java)
+
+                intent.putExtra("login", name)
+
+                intent.putExtra("password", password);
+
+                intent.putExtra("phonenumber", phonenumber);
+
+                context.startActivity(intent)
+
+            }){
+                Text(text = "Погода")
+            }
+
+        }
+
         Button(onClick = {
 
             SessionManagerUtil.endUserSession(context)
